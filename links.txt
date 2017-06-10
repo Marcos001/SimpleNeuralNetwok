@@ -1,0 +1,9 @@
+https://www.codeproject.com/Articles/821348/Multilayer-Perceptron-in-Python
+http://deeplearning.net/tutorial/mlp.html
+http://deeplearning.net/tutorial/code/mlp.py
+
+#massa
+http://scikit-neuralnetwork.readthedocs.io/en/latest/guide_model.html
+
+#tensorflow
+https://github.com/aymericdamien/TensorFlow-Examples
