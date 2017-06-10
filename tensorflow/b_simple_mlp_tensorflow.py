@@ -136,48 +136,34 @@ def main_char():
     print('test x = ', len(test_X), ' <> ',  test_X)
     print('test y = ', len(test_y), ' <> ',  test_y)
 
-    # Layer's sizes
-    x_size = 1  # Number of input nodes: 4 features and 1 bias
-    h_size = 8  # Number of hidden nodes # 256
-    y_size = 1  # Number of outcomes (3 iris flowers)
+    def func_quatra():
+        import numpy as np
+        import tensorflow as tf
 
-    # Symbols
-    X = tf.placeholder("float", shape=[None, x_size])
-    y = tf.placeholder("float", shape=[None, y_size])
+        # Declare list of features, we only have one real-valued feature
+        def model(features, labels, mode):
+            # Build a linear model and predict values
+            W = tf.get_variable("W", [1], dtype=tf.float64)
+            b = tf.get_variable("b", [1], dtype=tf.float64)
+            y = W * features['x'] + b
+            # Loss sub-graph
+            loss = tf.reduce_sum(tf.square(y - labels))
+            # Training sub-graph
+            global_step = tf.train.get_global_step()
+            optimizer = tf.train.GradientDescentOptimizer(0.01)
+            train = tf.group(optimizer.minimize(loss),
+                             tf.assign_add(global_step, 1))
+            # ModelFnOps connects subgraphs we built to the
+            # appropriate functionality.
+            return tf.contrib.learn.ModelFnOps(
+                mode=mode, predictions=y,
+                loss=loss,
+                train_op=train)
 
-    # Weight initializations
-    w_1 = init_weights((x_size, h_size))
-    w_2 = init_weights((h_size, y_size))
 
-    # Forward propagation
-    yhat = forwardprop(X, w_1, w_2)
-    predict = tf.argmax(yhat, axis=1)
 
-    # Backward propagation
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=yhat))
-    updates = tf.train.GradientDescentOptimizer(0.01).minimize(cost)
 
-    # Run SGD
-    sess = tf.Session()
-    init = tf.global_variables_initializer()
-    sess.run(init)
 
-    for epoch in range(100):
-        # Train with each example
-        for i in range(len(train_X)):
-
-            sess.run(updates, feed_dict={X: train_X[i: i + 1], y: train_y[i: i + 1]})
-            #sess.run(updates, feed_dict={X: train_X[i + 1], y: train_y[i + 1]})
-
-        train_accuracy = np.mean(np.argmax(train_y, axis=1) ==
-                                 sess.run(predict, feed_dict={X: train_X, y: train_y}))
-        test_accuracy = np.mean(np.argmax(test_y, axis=1) ==
-                                sess.run(predict, feed_dict={X: test_X, y: test_y}))
-
-        print("Epoch = %d, train accuracy = %.2f%%, test accuracy = %.2f%%"
-              % (epoch + 1, 100. * train_accuracy, 100. * test_accuracy))
-
-    sess.close()
 
 if __name__ == '__main__':
     main_char()
